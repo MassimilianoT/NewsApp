@@ -2,19 +2,19 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:news_app/models/article.dart';
-import 'package:news_app/models/everything_response.dart';
+import 'package:news_app/dto/everything_response.dart';
 import 'package:news_app/network/rest_client.dart';
+import 'package:news_app/repositories/news_repository.dart';
 
 part 'news_event.dart';
 
 part 'news_state.dart';
 
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
-  final RestClient restClient;
+  final NewsRepository newsRepository;
 
-  NewsBloc({required this.restClient}) : super(FetchingNewsState());
+  NewsBloc({required this.newsRepository}) : super(FetchingNewsState());
 
   @override
   Stream<NewsState> mapEventToState(
@@ -22,16 +22,16 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
   ) async* {
     if (event is FetchNewsEvent) {
       yield FetchingNewsState();
-      EverythingResponse? response;
+      List<Article>? articles;
       try {
-        response = await restClient.everything();
+        articles = await newsRepository.news();
       } catch (error) {
         yield ErrorNewsState(error.toString());
       }
 
-      if (response != null) {
-        if (response.articles.isNotEmpty) {
-          yield FetchedNewsState(response.articles);
+      if (articles != null) {
+        if (articles.isNotEmpty) {
+          yield FetchedNewsState(articles);
         } else {
           yield NoNewsState();
         }

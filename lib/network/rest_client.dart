@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:news_app/models/everything_response.dart';
+import 'package:news_app/dto/everything_response.dart';
 import 'package:http/http.dart' as http;
 class RestClient{
   Future<EverythingResponse> everything() async{

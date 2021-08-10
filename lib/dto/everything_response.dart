@@ -1,9 +1,12 @@
-import 'article.dart';
 
-class EverythingResponse {
+import 'package:news_app/dto/dto.dart';
+
+import 'article_dto.dart';
+
+class EverythingResponse extends DTO {
   final String ok;
   final int totalResults;
-  final List<Article> articles;
+  final List<ArticleDTO> articles;
 
   EverythingResponse(
       {required this.ok, required this.totalResults, required this.articles});
@@ -15,7 +18,10 @@ class EverythingResponse {
           articles: (json["articles"] as List)
               .map((article) {
                 print(article);
-                return Article.fromJson(article);
+                return ArticleDTO.fromJson(article);
               })
               .toList(growable: false));
+
+  @override
+  List<Object?> get props => [ok, totalResults, articles];
 }
