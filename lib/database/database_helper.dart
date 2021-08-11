@@ -10,20 +10,47 @@ class DatabaseHelper {
     }
     return _database = await openDatabase(
         join(await getDatabasesPath(), "news_app.db"),
-        version: 1, onCreate: (database, version) {
-      return database.execute(
-          "CREATE TABLE articles(id INTEGER PRIMARY KEY, title TEXT, description TEXT, imageUrl TEXT)");
+        version: 2, onCreate: (database, version) {
+      [
+        'CREATE TABLE articles(id INTEGER PRIMARY KEY, title TEXT, description TEXT, imageUrl TEXT, url TEXT UNIQUE)',
+        'CREATE TABLE favourites(id INTEGER PRIMARY KEY)',
+      ].forEach((query) async => await database.execute(query));
+    }, onUpgrade: (database, oldV, newV) {
+      if (oldV < 2) {
+        [
+          'DROP TABLE articles',
+          'CREATE TABLE articles(id INTEGER PRIMARY KEY, title TEXT, description TEXT, imageUrl TEXT, url TEXT UNIQUE)',
+          'CREATE TABLE favourites(id INTEGER PRIMARY KEY)',
+        ].forEach((query) async => await database.execute(query));
+      }
     });
   }
 
-  //Metodo di inserimento
-  Future<bool> insertArticle(Map<String, dynamic> article) async {
-    return await (await _currentDatabase()).insert("articles", article) > 0;
+  //Metodo di inserimento: ritorno l'id
+  Future<int> insertArticle(Map<String, dynamic> article) async {
+    return await (await _currentDatabase()).insert("articles", article,
+            conflictAlgorithm: ConflictAlgorithm.ignore);
     //Insert ritorna il numero di riga
+  }
+
+  Future<bool> saveFavouriteArticle(int id) async {
+    return await (await _currentDatabase()).insert("favourites", {"id": id}) >
+        0;
   }
 
   Future<List<Map<String, dynamic>>> getArticles() async {
     return await (await _currentDatabase()).query("articles");
     //Insert ritorna il numero di riga
+  }
+
+  Future<List<Map<String, dynamic>>> getFavouriteArticles() async {
+    return await (await _currentDatabase()).query("favourites");
+    //Insert ritorna il numero di riga
+  }
+
+  Future<bool> deleteFavouriteArticle(int id) async {
+    return await (await _currentDatabase())
+            .delete("favourites", where: 'id = ?', whereArgs: [id]) >
+        0;
   }
 }

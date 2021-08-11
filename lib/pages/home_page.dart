@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/blocs/favourites/favourite_bloc.dart';
 import 'package:news_app/blocs/news/news_bloc.dart';
 import 'package:news_app/models/article.dart';
 import 'package:news_app/widget/article_widget.dart';
@@ -10,17 +11,18 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("News App"),),
+      appBar: AppBar(
+        title: Text("News App"),
+      ),
       body: BlocBuilder<NewsBloc, NewsState>(
-        builder: (context, state){
-          if(state is ErrorNewsState){
+        builder: (context, state) {
+          if (state is ErrorNewsState) {
             return _errorNewsState(state.error);
-          }
-          else if(state is FetchingNewsState){
+          } else if (state is FetchingNewsState) {
             return _loadingNewsState();
-          }else if(state is NoNewsState){
+          } else if (state is NoNewsState) {
             return _noNewsState();
-          }else if(state is FetchedNewsState){
+          } else if (state is FetchedNewsState) {
             return _list(state.articles);
           }
           return Container();
@@ -29,18 +31,36 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _errorNewsState(String error) =>Center(child: Text(error),);
+  Widget _errorNewsState(String error) => Center(
+        child: Text(error),
+      );
 
-  Widget _loadingNewsState() => Center(child: CircularProgressIndicator(),);
+  Widget _loadingNewsState() => Center(
+        child: CircularProgressIndicator(),
+      );
 
-  Widget _noNewsState() => Center(child:Text("No news available"),);
+  Widget _noNewsState() => Center(
+        child: Text("No news available"),
+      );
 
   Widget _list(List<Article> articles) {
-    return ListView.builder(
-      itemCount: articles.length,
-        itemBuilder: (context, index) =>
-            ArticleWidget(articles[index]));
+    return BlocBuilder<FavouriteBloc, FavouriteState>(
+        builder: (ctx, state) {
+          return ListView.builder(
+            itemCount: articles.length,
+            itemBuilder: (context, i){
+              bool favourite = state.ids!.contains(articles[i].id);
+              var onTap = (favourite) ? () => context.read<FavouriteBloc>().deleteFavourite(articles[i].id!)
+                  :  () =>  context.read<FavouriteBloc>().saveFavourite(articles[i].id!);
+
+              return ArticleWidget(
+                articles[i],
+                onTap: onTap,
+                favourite: favourite,
+              );
+            },
+
+        );
+        });
   }
-
 }
-

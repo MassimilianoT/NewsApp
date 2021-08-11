@@ -40,12 +40,28 @@ class NewsRepository {
         throw Error();
       }
       articles = response.articles.map(newsMapper.toModel).toList();
-      articles.forEach((article) {
+      articles.forEach((article) async {
         final dbArticle = articleMapper.toDTO(article);
-        databaseHelper.insertArticle(dbArticle);
+        article.id = await databaseHelper.insertArticle(dbArticle);
       });
     }
 
     return articles;
+  }
+
+  Future<Set<int>> favourite() async {
+    return (await databaseHelper.getFavouriteArticles()).fold<Set<int>>(Set(),
+        (set, row) {
+      set.add(row["id"]);
+      return set;
+    });
+  }
+
+  Future<bool> saveFavourite(int id) async {
+    return await databaseHelper.saveFavouriteArticle(id);
+  }
+
+  Future<bool> deleteFavourite(int id) async {
+    return await databaseHelper.deleteFavouriteArticle(id);
   }
 }

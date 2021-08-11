@@ -1,6 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/blocs/favourites/favourite_bloc.dart';
 import 'package:news_app/blocs/news/news_bloc.dart';
 import 'package:news_app/database/database_helper.dart';
 import 'package:news_app/misc/mappers/database/article_mapper.dart';
@@ -35,7 +36,12 @@ class App extends StatelessWidget {
           BlocProvider(
               create: (context) =>
                   NewsBloc(newsRepository: context.read<NewsRepository>())
-                    ..fetchNews())
+                    ..fetchNews()),
+          BlocProvider(
+            create: (context) =>
+            FavouriteBloc(newsRepository: context.read<NewsRepository>())
+            ..fetchFavourites(),
+          )
         ],
         child: MaterialApp(
           title: 'News App',

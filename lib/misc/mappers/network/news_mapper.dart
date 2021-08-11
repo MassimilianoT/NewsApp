@@ -7,11 +7,15 @@ class NewsMapper extends DTOMapper<ArticleDTO, Article> {
   ArticleDTO toDTO(Article object) => ArticleDTO(
       title: object.title,
       description: object.description,
-      urlToImage: object.urlToImage);
+      urlToImage: object.urlToImage,
+      url: object.url,
+  );
 
   @override
   Article toModel(ArticleDTO object) => Article(
       title: object.title,
       description: object.description,
-      urlToImage: object.urlToImage);
+      urlToImage: object.urlToImage,
+      url: object.url!
+    ,);
 }

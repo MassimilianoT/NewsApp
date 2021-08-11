@@ -4,11 +4,13 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:news_app/models/article.dart';
 
 class ArticleWidget extends StatelessWidget {
-  const ArticleWidget(
-    this.article, {
-    Key? key,
-  }) : super(key: key);
   final Article article;
+  final bool favourite;
+  final VoidCallback onTap;
+
+  const ArticleWidget(this.article,
+      {Key? key, this.favourite = false, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +23,10 @@ class ArticleWidget extends StatelessWidget {
         progressIndicatorBuilder: (context, url, downloadProgress) =>
             CircularProgressIndicator(value: downloadProgress.progress),
         errorWidget: (context, url, error) => Icon(Icons.error),
+      ),
+      trailing: InkWell(
+        onTap: onTap,
+        child: Icon(favourite ? Icons.star : Icons.star_border),
       ),
     );
   }
