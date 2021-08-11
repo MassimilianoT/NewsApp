@@ -1,5 +1,5 @@
 import 'package:news_app/dto/article_dto.dart';
-import 'package:news_app/misc/mappers/dto_mapper.dart';
+import 'package:news_app/misc/mappers/network/dto_mapper.dart';
 import 'package:news_app/models/article.dart';
 
 class NewsMapper extends DTOMapper<ArticleDTO, Article> {
