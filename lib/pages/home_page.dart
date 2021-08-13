@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/blocs/favourites/favourite_bloc.dart';
 import 'package:news_app/blocs/news/news_bloc.dart';
 import 'package:news_app/models/article.dart';
+import 'package:news_app/models/favourite.dart';
 import 'package:news_app/widget/article_widget.dart';
 
 class HomePage extends StatelessWidget {
@@ -44,23 +45,22 @@ class HomePage extends StatelessWidget {
       );
 
   Widget _list(List<Article> articles) {
-    return BlocBuilder<FavouriteBloc, FavouriteState>(
-        builder: (ctx, state) {
-          return ListView.builder(
-            itemCount: articles.length,
-            itemBuilder: (context, i){
-              bool favourite = state.ids!.contains(articles[i].id);
-              var onTap = (favourite) ? () => context.read<FavouriteBloc>().deleteFavourite(articles[i].id!)
-                  :  () =>  context.read<FavouriteBloc>().saveFavourite(articles[i].id!);
+    return BlocBuilder<FavouriteBloc, FavouriteState>(builder: (ctx, state) {
+      return ListView.builder(
+        itemCount: articles.length,
+        itemBuilder: (context, i) {
+          Favourite? favourite = state.ids![articles[i].id];
+          var onTap = () => context.read<FavouriteBloc>().toggleFavourite(
+              articles[i].id,
+              favourite: state.ids![articles[i].id]);
 
-              return ArticleWidget(
-                articles[i],
-                onTap: onTap,
-                favourite: favourite,
-              );
-            },
-
-        );
-        });
+          return ArticleWidget(
+            articles[i],
+            onTap: onTap,
+            favourite: favourite,
+          );
+        },
+      );
+    });
   }
 }

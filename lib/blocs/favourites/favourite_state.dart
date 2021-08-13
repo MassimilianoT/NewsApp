@@ -1,7 +1,7 @@
 part of 'favourite_bloc.dart';
 
 class FavouriteState extends Equatable {
- final Set<int>? ids;
+ final Map<int, Favourite>? ids;
 
   FavouriteState({this.ids});
 

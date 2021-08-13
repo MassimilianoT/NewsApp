@@ -49,19 +49,5 @@ class NewsRepository {
     return articles;
   }
 
-  Future<Set<int>> favourite() async {
-    return (await databaseHelper.getFavouriteArticles()).fold<Set<int>>(Set(),
-        (set, row) {
-      set.add(row["id"]);
-      return set;
-    });
-  }
 
-  Future<bool> saveFavourite(int id) async {
-    return await databaseHelper.saveFavouriteArticle(id);
-  }
-
-  Future<bool> deleteFavourite(int id) async {
-    return await databaseHelper.deleteFavouriteArticle(id);
-  }
 }

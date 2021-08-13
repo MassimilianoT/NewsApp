@@ -5,8 +5,10 @@ import 'package:news_app/blocs/favourites/favourite_bloc.dart';
 import 'package:news_app/blocs/news/news_bloc.dart';
 import 'package:news_app/database/database_helper.dart';
 import 'package:news_app/misc/mappers/database/article_mapper.dart';
+import 'package:news_app/misc/mappers/database/favourite_mapper.dart';
 import 'package:news_app/misc/mappers/network/news_mapper.dart';
 import 'package:news_app/network/rest_client.dart';
+import 'package:news_app/repositories/favourite_repository.dart';
 import 'package:news_app/repositories/news_repository.dart';
 
 import 'pages/home_page.dart';
@@ -17,19 +19,20 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(
-          lazy: false,
-            create: (_) => DatabaseHelper()),
+        RepositoryProvider(lazy: false, create: (_) => DatabaseHelper()),
         RepositoryProvider(
           lazy: false,
           create: (context) => NewsRepository(
               restClient: RestClient(),
               newsMapper: NewsMapper(),
-            connectivity: Connectivity(),
-            articleMapper: ArticleMapper(),
-            databaseHelper: context.read<DatabaseHelper>()
-          ),
+              connectivity: Connectivity(),
+              articleMapper: ArticleMapper(),
+              databaseHelper: context.read<DatabaseHelper>()),
         ),
+        RepositoryProvider(
+            create: (context) => FavouriteRepository(
+                databaseHelper: context.read<DatabaseHelper>(),
+                favouriteMapper: FavouriteMapper()))
       ],
       child: MultiBlocProvider(
         providers: [
@@ -39,8 +42,8 @@ class App extends StatelessWidget {
                     ..fetchNews()),
           BlocProvider(
             create: (context) =>
-            FavouriteBloc(newsRepository: context.read<NewsRepository>())
-            ..fetchFavourites(),
+                FavouriteBloc(favouriteRepository: context.read<FavouriteRepository>())
+                  ..fetchFavourites(),
           )
         ],
         child: MaterialApp(

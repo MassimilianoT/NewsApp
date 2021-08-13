@@ -10,10 +10,10 @@ class DatabaseHelper {
     }
     return _database = await openDatabase(
         join(await getDatabasesPath(), "news_app.db"),
-        version: 2, onCreate: (database, version) {
+        version: 3, onCreate: (database, version) {
       [
         'CREATE TABLE articles(id INTEGER PRIMARY KEY, title TEXT, description TEXT, imageUrl TEXT, url TEXT UNIQUE)',
-        'CREATE TABLE favourites(id INTEGER PRIMARY KEY)',
+        'CREATE TABLE favourites(id INTEGER PRIMARY KEY, color TEXT NOT NULL DEFAULT "yellow")',
       ].forEach((query) async => await database.execute(query));
     }, onUpgrade: (database, oldV, newV) {
       if (oldV < 2) {
@@ -22,6 +22,10 @@ class DatabaseHelper {
           'CREATE TABLE articles(id INTEGER PRIMARY KEY, title TEXT, description TEXT, imageUrl TEXT, url TEXT UNIQUE)',
           'CREATE TABLE favourites(id INTEGER PRIMARY KEY)',
         ].forEach((query) async => await database.execute(query));
+      } else if (oldV < 3) {
+        [
+          'ALTER TABLE favourites ADD COLUMN color TEXT NOT NULL DEFAULT "yellow"',
+        ].forEach((query) async => await database.execute(query));
       }
     });
   }
@@ -29,7 +33,7 @@ class DatabaseHelper {
   //Metodo di inserimento: ritorno l'id
   Future<int> insertArticle(Map<String, dynamic> article) async {
     return await (await _currentDatabase()).insert("articles", article,
-            conflictAlgorithm: ConflictAlgorithm.ignore);
+        conflictAlgorithm: ConflictAlgorithm.ignore);
     //Insert ritorna il numero di riga
   }
 
@@ -46,6 +50,12 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getFavouriteArticles() async {
     return await (await _currentDatabase()).query("favourites");
     //Insert ritorna il numero di riga
+  }
+
+  Future<bool> updateFavouriteArticle(Map<String, dynamic> favourite) async {
+    return await (await _currentDatabase()).update("favourites", favourite,
+            where: "id = ?", whereArgs: [favourite["id"]]) >
+        0;
   }
 
   Future<bool> deleteFavouriteArticle(int id) async {
