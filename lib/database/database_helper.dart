@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseHelper {
   Database? _database;
 
-  Future<Database> _currentDatabase() async {
+  Future<Database> get database async {
     if (_database != null) {
       return _database!;
     }
@@ -30,37 +30,7 @@ class DatabaseHelper {
     });
   }
 
-  //Metodo di inserimento: ritorno l'id
-  Future<int> insertArticle(Map<String, dynamic> article) async {
-    return await (await _currentDatabase()).insert("articles", article,
-        conflictAlgorithm: ConflictAlgorithm.ignore);
-    //Insert ritorna il numero di riga
-  }
 
-  Future<bool> saveFavouriteArticle(int id) async {
-    return await (await _currentDatabase()).insert("favourites", {"id": id}) >
-        0;
-  }
 
-  Future<List<Map<String, dynamic>>> getArticles() async {
-    return await (await _currentDatabase()).query("articles");
-    //Insert ritorna il numero di riga
-  }
 
-  Future<List<Map<String, dynamic>>> getFavouriteArticles() async {
-    return await (await _currentDatabase()).query("favourites");
-    //Insert ritorna il numero di riga
-  }
-
-  Future<bool> updateFavouriteArticle(Map<String, dynamic> favourite) async {
-    return await (await _currentDatabase()).update("favourites", favourite,
-            where: "id = ?", whereArgs: [favourite["id"]]) >
-        0;
-  }
-
-  Future<bool> deleteFavouriteArticle(int id) async {
-    return await (await _currentDatabase())
-            .delete("favourites", where: 'id = ?', whereArgs: [id]) >
-        0;
-  }
 }

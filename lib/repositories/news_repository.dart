@@ -1,4 +1,5 @@
 import 'package:connectivity/connectivity.dart';
+import 'package:news_app/database/dao/articles_dao.dart';
 import 'package:news_app/database/database_helper.dart';
 import 'package:news_app/dto/article_dto.dart';
 import 'package:news_app/misc/mappers/network/dto_mapper.dart';
@@ -11,13 +12,13 @@ class NewsRepository {
   final RestClient restClient;
   final DTOMapper<ArticleDTO, Article> newsMapper;
   final db.DTOMapper<Article> articleMapper;
-  final DatabaseHelper databaseHelper;
+  final ArticlesDAO articlesDao;
   final Connectivity connectivity;
 
   NewsRepository({
     required this.restClient,
     required this.newsMapper,
-    required this.databaseHelper,
+    required this.articlesDao,
     required this.connectivity,
     required this.articleMapper,
   });
@@ -29,7 +30,7 @@ class NewsRepository {
     if (connectivityResult == ConnectivityResult.none) {
       //Non ho internet
       final List<Map<String, dynamic>> dbArticles =
-          await databaseHelper.getArticles();
+          await articlesDao.getArticles();
       //Mi serve un mapper!
       articles = dbArticles.map(articleMapper.toModel).toList();
     } else {
@@ -42,7 +43,7 @@ class NewsRepository {
       articles = response.articles.map(newsMapper.toModel).toList();
       articles.forEach((article) async {
         final dbArticle = articleMapper.toDTO(article);
-        article.id = await databaseHelper.insertArticle(dbArticle);
+        article.id = await articlesDao.insertArticle(dbArticle);
       });
     }
 
